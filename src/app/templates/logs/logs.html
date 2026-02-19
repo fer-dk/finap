@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title%}Logs{% endblock %}
+
+{% block content %}
+  <h2>Listado de Logs</h2>
+
+  {% if registros and registros|length > 0 %}
+    <table border="1" cellspacing="0" cellpadding="5">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Acción</th>
+          <th>Fecha/Hora</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in registros %}
+        <tr>
+          <td>{{ r.id }}</td>
+          <td>{{ r.usuario }}</td>
+          <td>{{ r.accion }}</td>
+          <td>{{ r.fecha_hora }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No hay registros en la tabla de logs.</p>
+  {% endif %}
+{% endblock %}

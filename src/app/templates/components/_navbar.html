@@ -1,0 +1,21 @@
+<nav id="navmenu" class="navmenu">
+  <ul>
+    {% for item in nav_items %}
+      <li>  <!-- A -->
+         <a href="{{ url_for(item.endpoint) }}" 
+            class="{% if request.endpoint == item.endpoint %}active{% endif %}"> 
+            {{ item.label }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+</nav>
+
+
+<!-- A - Si el endpoint actual (la vista que se esta ejecutando) coincide con el enpoint del item del menu, Flask
+        Inyecta la palabra active dentro del atributo class. Sin active no habria forma de q CSS sepa cual link
+        pertenece a la pagina que esta abierta. Sirve para diferenciar el item del menu actual y estilizarlo
+        distinto del resto, sin hover. 
+-->
+

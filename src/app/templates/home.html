@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %} Home {% endblock %}
+
+{% block navbar %}
+    {% include "components/_navbar.html"  %}
+{% endblock %}
+
+{% block content %}
+
+<section id="services" class="services section">
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-5">
+
+          {% for section in main_sections %}
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-item">
+              <!-- <div class="service-icon"> -->
+                <i class="bi bi-graph-up-arrow"></i>
+              <!-- </div> -->
+              <h3>{{ section.name }}</h3>
+              <p>{{section.description}}</p>
+              <a href="{{ url_for(section.endpoint)}}" class="service-link">
+                Ingresar <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div><!-- End Service Item -->
+          {% endfor %}
+
+        </div> <!-- /row -->
+
+    </div> <!-- /container -->
+
+</section>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %} Prestación {% endblock %}
+
+{% block navbar %}
+    {% include "components/_navbar.html"  %}
+{% endblock %}
+
+{% block content %}
+
+  <h4>Formulario Insertar prestación</h4>
+  <form action="{{ url_for('prestaciones.prestacion_insert')}}" method="post">
+    <label for="nombre">Nombre de la prestación</label><br>
+    <!-- sacamos "required" en el input para probar el mensaje que devuelve el servidor si es vacio -->
+    <input type="text" id="nombre" name="nombrePrestacion" />
+    <button type="submit">Insertar</button>
+  </form>
+
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% if mensajes %}
+      {% for categoria, mensaje in mensajes %}
+      <div class="alert alert-{{ 'success' if categoria == 'success' else 'warning'}} mt-3">
+        {{ mensaje }}
+      </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <p style="margin-top:10px;">
+    <a href="/listarLogs">Ver logs</a>
+  </p>
+
+  <p style="margin-top:10px;">
+    <a href="/crearTablaPrestaciones">Crear Tabla Prestaciones</a>
+  </p>
+
+  <p style="margin-top:10px;">
+    <a href="/listarTablas">Ver tablas</a>
+  </p>
+
+
+{% endblock %}
