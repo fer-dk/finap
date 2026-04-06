@@ -1,6 +1,6 @@
 from app.domain.ports import LogsRepoPort
 
-class LogsService:
+class LogService:
     def __init__(self, repo:LogsRepoPort):
         self.repo = repo
 

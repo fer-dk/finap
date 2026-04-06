@@ -6,7 +6,7 @@ from typing import Optional
 @dataclass #A
 class Prestacion:
     id: Optional[int] = None
-    nombre: str = ""
+    name: str = ""
 
 # CONCEPTOS ------------
 

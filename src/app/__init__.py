@@ -6,15 +6,21 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 import os
-from app.config import NasConfig, MacConfig
+from app.config import MacDevMySqlConfig, MacSqliteConfig
 
 # --- Extensión global ---
 db = SQLAlchemy()
 
-# --- Importamos repo y servicios ---
-from app.infrastructure.logs_repo import LogsRepo
+# --- Modelos ORM ---
+from app.infrastructure.models.prestacion_model import PrestacionModel
+from app.infrastructure.models.log_model import LogModel
+
+# --- Repos ---
+from app.infrastructure.log_repo import LogRepo
 from app.infrastructure.prestacion_repo import PrestacionRepo
-from app.application.logs_service import LogsService
+
+# --- Servicios ---
+from app.application.log_service import LogService
 from app.application.prestacion_service import PrestacionService
 
 # la siguiente funcion crea un objeto Flask
@@ -22,25 +28,29 @@ def create_app():
     # Instancia de Flask
     app = Flask(__name__, instance_relative_config=True)
     # Busca en el sistema una variable llamada APP_ENV
-    env = os.environ.get("APP_ENV", "NasConfig")
+    env = os.environ.get("APP_ENV", "MacDevMySqlConfig")
 
-    if env == "MacConfig":
-        app.config.from_object(MacConfig)
-    else:
-        app.config.from_object(NasConfig)
+    config_map = {
+        "MacDevMySqlConfig": MacDevMySqlConfig,
+        "MacSqliteConfig": MacSqliteConfig
+    }
 
+    app.config.from_object(config_map.get(env, MacDevMySqlConfig))
     # app.config["EXPLAIN_TEMPLATE_LOADING"] = True
 
     db.init_app(app) # Inicializar extensión con la app
 
+    with app.app_context():
+        db.create_all()
+
     # === Inyeccion de dependencias ===
-    #Crear repos
-    app.logs_repo = LogsRepo(db)
+
+    app.log_repo = LogRepo(db)
     app.prestacion_repo = PrestacionRepo(db)
 
     #Crear Servicios
-    app.logs_service = LogsService(app.logs_repo)
-    app.prestacion_service = PrestacionService(app.prestacion_repo,app.logs_repo)
+    app.log_service = LogService(app.log_repo)
+    app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo)
 
     # === Registrar blueprints ===
     from app.blueprints.main import bp as main_bp
@@ -54,7 +64,6 @@ def create_app():
 
     from app.blueprints.api import bp as api_bp
     app.register_blueprint(api_bp)
-
 
 
     # === Context Processor inyecta menus a todas las plantillas ===

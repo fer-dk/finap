@@ -13,13 +13,13 @@ def _read_version() -> str: # A
             return f.readline().strip() or "unknown" # E
     except OSError: #F
         return "unknown"
-    
+
 app.config["APP_VERSION"] = _read_version() #G
 
 # A - "_read.." indica que la funcion existe para uso interno del modulo, no para ser importada desde otro lado
 
 
-# B -  "__file__" variable especial python. Contiene la ruta del archivo actual que se está ejecutando. Se usa para construir rutas relativas al archivo.          
+# B -  "__file__" variable especial python. Contiene la ruta del archivo actual que se está ejecutando. Se usa para construir rutas relativas al archivo.
 #                 puede ser absoluta "C:\\Users\\A988021\\Desktop\\FINAP_DEV\\wsgi.py" . La Abolutidad depende del origen de la ruta siempre empieza desde la raiz
 #                 puede ser relativa "wsgi.py" . Aquí depende del directorio actual de ejecucio(working directory)
 #
@@ -44,7 +44,6 @@ app.config["APP_VERSION"] = _read_version() #G
 # F - "OSError" es una excepción base del sistema operativo(Archivo inexistente, Permisos insuficientes, Path invalido)
 #               es una subclase porque herea de Exception y agrupa errores relacionados con el SO.
 
-# G - 'app.config["APP_VERSION"]' 
+# G - 'app.config["APP_VERSION"]'
 #      es una configuracion interna de Flask, no una variable de entorno. Guarda el valor del objeto Flask para acceso Global
-#      Centraliza configuracion, es accesible desde vistasm templates, blueprints.
-                                  
+#      Centraliza configuracion, es accesible desde vistas templates, blueprints.
