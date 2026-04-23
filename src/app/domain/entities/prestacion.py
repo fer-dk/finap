@@ -8,17 +8,25 @@ class Prestacion:
     id: Optional[int] = None
     name: str = ""
 
+    # Regla de negocio: una Prestación sin name no tiene sentido
+    def __post_init__(self): #B
+        self.name = (self.name or "").strip() #C
+        if not self.name:
+            raise ValueError("El nombre de la prestación es obligatorio")
+
 # CONCEPTOS ------------
 
-# El modelo es una clase que representa una entidad del dominio del negocio, NO la tabla en sí.
-# Modelo de dominio representa qué es una Prestación como concepto del negocio. Es solo el model de un objeto de dominio (Prestacion)
-# El "model" aparece de forma explicita cuando definimos la entidad como objeto (dentro routes.py), y service la crea pasandola como parametro
+# Prestacion es una entidad de dominio.
+# Representa el concepto de negocio "Prestación", no una tabla de base de datos.
 
-# PrestacionRepository es el motor (acceso a datos)
-# PrestacionService es el auto (usa un repo para aplicar reglas)
+# El service y/o el repositorio participan en la construcción y uso
+# de la entidad de dominio según el caso de uso.
 
-# No se usa "herencia", sino "composición"
-# El Service USA el repositorio.
 
 # ------------------------
-#A - crea automaticamente el constructor. Usarlo cuando la clase es sólo un contenedor de datos.
+
+# A - crea automaticamente el constructor. Usarlo cuando la clase es sólo un contenedor de datos.
+
+# B - Es un nombre especial y reservado exclusivamente para las @dataclasses.
+
+# C - "Usa el name que me dieron, pero si por alguna razón es nulo, trátalo como un texto vacío para que no falle la limpieza".

@@ -48,7 +48,7 @@ def create_app():
     app.log_repo = LogRepo(db)
     app.prestacion_repo = PrestacionRepo(db)
 
-    #Crear Servicios
+    # Crear Servicios
     app.log_service = LogService(app.log_repo)
     app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo)
 

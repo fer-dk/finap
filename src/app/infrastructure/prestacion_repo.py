@@ -9,9 +9,8 @@ class PrestacionRepo(PrestacionRepoPort):
     def __init__(self, db): #A
         self.db = db #B
 
-    def insertar(self, name: str) -> Prestacion:
-        # Acceso directo a la DB (rol de Gateway)
-        nueva_prestacion = PrestacionModel(name=name)
+    def insertar(self, prestacion: Prestacion) -> Prestacion:
+        nueva_prestacion = PrestacionModel(name=prestacion.name) # Acceso directo a la DB (rol de Gateway)
         self.db.session.add(nueva_prestacion)
         self.db.session.commit()
 

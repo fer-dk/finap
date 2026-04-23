@@ -1,16 +1,17 @@
-#DOMINIO
+from app.domain.entities.prestacion import Prestacion
+from app.domain.entities.log import Log
 from abc import ABC, abstractmethod
 
 # Abstract Base Classes
 class PrestacionRepoPort(ABC): #A
     # Guarda una prestacion y devuelve el objeto de dominio
     @abstractmethod #B
-    def insertar(self, nombre: str):
+    def insertar(self, prestacion: Prestacion)-> Prestacion:
         pass
 
     # Devuelve una todas las prestaciones de dominio
     @abstractmethod
-    def listar(self):
+    def listar(self) -> list[Prestacion]:
         pass
 
 class LogsRepoPort(ABC):
@@ -21,7 +22,7 @@ class LogsRepoPort(ABC):
 
     # Devuelve una lista de objetos Log de dominio
     @abstractmethod
-    def listar(self):
+    def listar(self) -> list[Log]:
         pass
 
 # A - ABC Define una interfaz común con métodos que las clases heredadas
