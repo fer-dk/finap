@@ -44,13 +44,12 @@ def create_app():
         db.create_all()
 
     # === Inyeccion de dependencias ===
-
     app.log_repo = LogRepo(db)
     app.prestacion_repo = PrestacionRepo(db)
 
     # Crear Servicios
     app.log_service = LogService(app.log_repo)
-    app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo)
+    app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo, db)
 
     # === Registrar blueprints ===
     from app.blueprints.main import bp as main_bp

@@ -9,8 +9,7 @@ class LogRepo(LogsRepoPort):
 
     def registrar(self, user: str, action: str):
         nuevo_log = LogModel(user=user, action=action, datetime = datetime.now())
-        self.db.session.add(nuevo_log)
-        self.db.session.commit()
+        self.db.session.add(nuevo_log) # no hacemos commit pq depende de insertar()
 
     def listar(self) -> list[Log]: #A
         filas = LogModel.query.order_by(LogModel.id.desc()).all()

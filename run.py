@@ -5,7 +5,7 @@ import sys
 import threading
 import webbrowser
 
-# --- Parche: asegurar que FINAP/src esté en sys.path ---
+# Parche: asegurar que FINAP/src esté en sys.path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))   # Calcula ruta absoluta ""...\FINAP"
 SRC_DIR = os.path.join(BASE_DIR, "src")                 # ...\FINAP\src
 if SRC_DIR not in sys.path:
@@ -13,12 +13,10 @@ if SRC_DIR not in sys.path:
 
 from wsgi import app                                    # Python busca SRC_DIR (...\FINAP\src) y encuentra a wsgi.py
 
-
 def abrir_navegador():
-    webbrowser.open("http://127.0.0.1:5000/")
+    webbrowser.open("http://127.0.0.1:5000/") # la app ocupa esa terminal
 
-
-# === Mostrar endpoints registrados (solo en modo debug) ===
+# Imprime endpoints registrados (solo en modo debug)
 def _print_endpoints(app):
     print("\n------ Endpoints --------\n")
     for rule in app.url_map.iter_rules():
@@ -28,14 +26,16 @@ def _print_endpoints(app):
 
 
 if __name__ == "__main__":
-    mode = os.getenv("APP_MODE", "production").lower() # cambiar a "production" o "developtment"
+    # Decide Modo
+    mode = os.getenv("APP_MODE", "develpoment").lower() # cambiar a "production" o "developtment"
     debug = (mode == "development")
 
     print(f"[INFO] Modo: {mode.upper()}")
 
-    # abrir navegador una sola vez
+    # Abre navegadors
     threading.Timer(1.5, abrir_navegador).start()
 
+    # Decide servidor
     if debug:
         _print_endpoints(app)
         app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=True)

@@ -10,17 +10,17 @@ def mostrar_form(): # View Fuction
 
 @bp.route("/prestacion", methods=["POST"], endpoint="prestacion_insert")
 def insertar_prestacion():
-    # Aquí estás en la capa HTTP: leés datos de la request
-    namePres = (request.form.get("nombrePrestacion") or "").strip()
-    if not namePres:
-        flash("Debe ingresar un nombre.", "warning")
+    namePres = request.form.get("nombrePrestacion")
+    service = current_app.prestacion_service # Adaptador HTTP: llama al caso de uso
+
+    try:
+        service.crear(namePres) # pasa los objetos de dominio a la vista
+        flash("Registro y Log con éxito", "success")
+    except ValueError as e:
+        flash(str(e), "warning")
         return redirect(url_for("prestaciones.prestacion_form"))
 
-    # Adaptador HTTP: llama al caso de uso y pasa los objetos de dominio a la vista
-    service = current_app.prestacion_service
-    service.crear(namePres)
-    flash("Registro y Log con éxito", "success")
-    return redirect(url_for("prestaciones.prestacion_form")) # Redirige al mismo endpoint y envita re-envíos del form si el user resfresca la pagina
+    return redirect(url_for("prestaciones.prestacion_form")) # Redirige al mismo endpoint y evita re-envíos del form si el user resfresca la pagina
 
 
 # =======================
