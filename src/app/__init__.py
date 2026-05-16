@@ -12,16 +12,19 @@ from app.config import MacDevMySqlConfig, MacSqliteConfig
 db = SQLAlchemy()
 
 # --- Modelos ORM ---
+# para que db.create_all() cree la tabla.
 from app.infrastructure.models.prestacion_model import PrestacionModel
 from app.infrastructure.models.log_model import LogModel
+from app.infrastructure.models.user_model import UserModel
 
 # --- Repos ---
 from app.infrastructure.log_repo import LogRepo
 from app.infrastructure.prestacion_repo import PrestacionRepo
-
+from app.infrastructure.user_repo import UserRepo
 # --- Servicios ---
 from app.application.log_service import LogService
 from app.application.prestacion_service import PrestacionService
+from app.application.auth_service import AuthService
 
 # la siguiente funcion crea un objeto Flask
 def create_app():
@@ -44,12 +47,15 @@ def create_app():
         db.create_all()
 
     # === Inyeccion de dependencias ===
+    # ADAPTADOR (definicion)
     app.log_repo = LogRepo(db)
     app.prestacion_repo = PrestacionRepo(db)
+    app.user_repo = UserRepo(db)
 
     # Crear Servicios
     app.log_service = LogService(app.log_repo)
     app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo, db)
+    app.auth_service = AuthService(app.user_repo, db)
 
     # === Registrar blueprints ===
     from app.blueprints.main import bp as main_bp
@@ -64,17 +70,13 @@ def create_app():
     from app.blueprints.api import bp as api_bp
     app.register_blueprint(api_bp)
 
+    from app.blueprints.auth import bp as auth_bp
+    app.register_blueprint(auth_bp, url_prefix="" )
 
     # === Context Processor inyecta menus a todas las plantillas ===
     from app.config.navigation import main_sections, navbars
 
-    # Context processor es una funcion especial que retorna un diccionario con claves,
-    # esas claves las inyecta como variables globales al contexto de Jinja.
-    # En vez de pasar manualmente las variables en cada render_template(),
-    # automaticamente tiene acceso a ellas con contextprocessor.
-    # Ventajas: No duplicamos includes ni pasamos manualmente listas desde cada controlador.
-
-    @app.context_processor
+    @app.context_processor # A
     def inject_navigation():
         bp_name = request.blueprint or "main" # aquí Flask reconoce de que blueprint viene la ruta actual (en que modulo está usuario). Es un atajo de un if pero no es un if
         nav_items = navbars.get(bp_name) # busca en el diccionario "navbar" de navigation.py al blueprint
@@ -87,3 +89,9 @@ def create_app():
         )
 
     return app
+
+# A - # Context processor es una funcion especial que retorna un diccionario con claves,
+      # esas claves las inyecta como variables globales al contexto de Jinja.
+      # En vez de pasar manualmente las variables en cada render_template(),
+      # automaticamente tiene acceso a ellas con contextprocessor.
+      # Ventajas: No duplicamos includes ni pasamos manualmente listas desde cada controlador.

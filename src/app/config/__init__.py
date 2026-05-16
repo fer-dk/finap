@@ -4,6 +4,7 @@ from pathlib import Path
 # Flask solo toma los atributos en MAYUSCULA del objeto/modulo
 class DbConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # La sesión de Flask por defecto está firmada con SECRET_KEY
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
 
 # Entorno Corporativo -----------------------------

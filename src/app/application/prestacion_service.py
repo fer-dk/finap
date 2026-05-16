@@ -5,7 +5,7 @@ from app.domain.ports import PrestacionRepoPort, LogsRepoPort
 
 # Servicio de aplicación = capa de CASOS DE USO
 class PrestacionService:
-    def __init__(self,repoPrest: PrestacionRepoPort, repoLogs: LogsRepoPort, db):
+    def __init__(self, repoPrest: PrestacionRepoPort, repoLogs: LogsRepoPort, db): # A <--- Implementa el puerto
         self.prest = repoPrest
         self.logs = repoLogs
         self.db = db
@@ -29,3 +29,5 @@ class PrestacionService:
 
     def listar(self):
         return self.prest.listar()
+
+# A - "Recibo un objeto (repoPrest) que tiene la forma del Puerto."

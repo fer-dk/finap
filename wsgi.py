@@ -25,7 +25,7 @@ app.config["APP_VERSION"] = _read_version() #G
 #
 #     "os.path.abspath" garantiza que file no dependa del directorio desde donde se ejecuta el proceso. Normaliza y fuerza absotulidad
 #
-#     "os.path.dirname" en base a la ruta genereada por os.path.abspath ubicamos los archivos relativos de dicha ruta, y los guardamos en base_dir
+#     "os.path.dirname" en base a la ruta generada por os.path.abspath ubicamos los archivos relativos de dicha ruta, y los guardamos en base_dir
 
 
 # C - "os.path.join" construye una ruta correcta. Concatena e inserta "/" o "\" según el SO. Evitando errores
@@ -42,7 +42,7 @@ app.config["APP_VERSION"] = _read_version() #G
 #          "strip()" elimina espacios, \n y tabs
 
 # F - "OSError" es una excepción base del sistema operativo(Archivo inexistente, Permisos insuficientes, Path invalido)
-#               es una subclase porque herea de Exception y agrupa errores relacionados con el SO.
+#               es una subclase porque hereda de Exception y agrupa errores relacionados con el SO.
 
 # G - 'app.config["APP_VERSION"]'
 #      es una configuracion interna de Flask, no una variable de entorno. Guarda el valor del objeto Flask para acceso Global
