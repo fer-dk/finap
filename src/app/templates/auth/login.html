@@ -9,17 +9,27 @@
     <form method="POST" action="{{ url_for('auth.login_post') }}">
         <div class="mb-3">
             <label for="username" class="form-label">Usuario</label>
-            <input type="text" class="form-control" id="username" name="usarname">
+            <input type="text" class="form-control" id="username" name="username">
         </div>
 
         <div class="mb-3">
             <label for="password" class="form-label">Contraseña</label>
             <input type="password" class="form-control" id="password" name="password">
         </div>
-
         <button type="submit" class="btn btn-primary">Ingresar</button>
     </form>
 </div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for categorie, message in messages %}
+        <div class="alert alert-{{ 'success' if categorie == 'success' else 'warning'}} mt-3">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 {% endblock %}
 
 

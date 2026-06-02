@@ -24,8 +24,8 @@ class UserRepo(UserRepoPort):
 
     def create_user(self, username:str, password_hash:str, role:str = "user" ) -> User: #B
         user_model = UserModel(username=username, password_hash=password_hash, role=role, is_active=True)
-        self.session.add(user_model)
-        self.session.flush()
+        self.db.session.add(user_model)
+        self.db.session.flush()
 
         return User(
             id = user_model.id,

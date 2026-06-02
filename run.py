@@ -16,28 +16,19 @@ from wsgi import app                                    # Python busca SRC_DIR (
 def abrir_navegador():
     webbrowser.open("http://127.0.0.1:5000/") # la app ocupa esa terminal
 
-# Imprime endpoints registrados (solo en modo debug)
-def _print_endpoints(app):
-    print("\n------ Endpoints --------\n")
-    for rule in app.url_map.iter_rules():
-        methods = ",".join(sorted(rule.methods - {"HEAD", "OPTIONS"}))
-        print(f"{rule.endpoint:<35} → {rule.rule:<25} [ {methods} ]")
-    print("\n-------------------------\n")
-
-
 if __name__ == "__main__":
     # Decide Modo
-    mode = os.getenv("APP_MODE", "develpoment").lower() # cambiar a "production" o "developtment"
+    mode = os.getenv("APP_MODE", "production").lower() # cambiar a "production" o "developtment"
     debug = (mode == "development")
 
     print(f"[INFO] Modo: {mode.upper()}")
 
-    # Abre navegadors
+    # Abre navegador
     threading.Timer(1.5, abrir_navegador).start()
 
     # Decide servidor
     if debug:
-        _print_endpoints(app)
+        # Servidor de desarrollo Werkzeug
         app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=True)
     else:
         from waitress import serve

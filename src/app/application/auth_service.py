@@ -1,7 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from app.domain.entities.user import User
-from app.domain.entities.user_credentials import UserCredentials
 from app.domain.ports import UserRepoPort
 
 class AuthService:
@@ -36,18 +34,19 @@ class AuthService:
     def login(self, username: str, password: str) -> User:
         # Reglas de autenticación para usuario
         username = (username or "").strip()
-        if not username or password: # A
-            raise ValueError("Usuario o contraseña inválidos")
+        if not username or not password: # A
+            raise ValueError("Usuario o contraseña inválidos1")
 
         # Reglas de autenticación para credenciales
         credentials = self.user_repo.find_credentials_by_username(username)
+
         if credentials is None:
-            raise ValueError("Usuario o contraseña inválidos.")
-        if credentials.user.is_active:
+            raise ValueError("Usuario o contraseña inválidos.2")
+        if not credentials.user.is_active:
             raise ValueError("Usuario inactivo.")
-        # Compara el password ingresado vs password hasheado
+        # Cuando el usuario es correcto Compara el password ingresado vs password hasheado
         if not check_password_hash(credentials.password_hash, password):
-            raise ValueError("Usuario o contraseña invalidos.")
+            raise ValueError("Usuario o contraseña invalidos.3")
 
         return credentials.user
 

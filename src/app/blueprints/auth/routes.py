@@ -12,8 +12,11 @@ def login_post():
     username = request.form.get("username")
     password = request.form.get("password")
 
+    print("Login post:", username, password)
+
     try:
         user = current_app.auth_service.login(username, password)
+        print("login ok", user)
 
         session["user_id"] = user.id
         session["username"] = user.username
@@ -22,10 +25,11 @@ def login_post():
         flash("Inicio de sesión correcta.", "success")
         return redirect(url_for("main.home"))
     except ValueError as e:
+        print("login error", e)
         flash(str(e), "warning")
         return redirect(url_for("auth.login_form"))
 
-@bp.route("/login", methods=["GET"], endpoint="logout")
+@bp.route("/logout", methods=["GET"], endpoint="logout")
 def logout():
     session.clear()
     flash("Sesión cerrada", "info")

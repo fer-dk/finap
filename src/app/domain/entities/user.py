@@ -6,4 +6,4 @@ class User:
     id: Optional[int] = None
     username: str = ""
     role: str = ""
-    is_active = True
+    is_active:bool = True

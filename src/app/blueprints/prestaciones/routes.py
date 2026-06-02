@@ -1,9 +1,12 @@
 #CONTROLLERS
 from . import bp
+from app.auth.decorators import login_required
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app
 
 # Controlador HTTP / HTML (capa de interfaz)
-@bp.route("/prestacion", methods=["GET"], endpoint="prestacion_form") #A,B
+@bp.route("/prestacion", methods=["GET"], endpoint="prestacion_form") #B,C
+# Adaptador de Entrada (Controller/Driver) de seguridad (no es capa de seguridad)
+@login_required # A
 def mostrar_form(): # View Fuction
     # Actua como un Presenter
     return render_template("prestaciones/prestacion.html")
@@ -44,6 +47,6 @@ def api_listar_prestacion():
 
     return jsonify(data), 200
 
-
-# A - El endpoint lo define Flask como la concatenación del nombre del Blueprint y de la Funcion
-# B - URL Path - Asocia la url (viene del base.html) a la funcion "prestaciones"
+# A - el request ya no llega al caso de uso si el usuario no está autenticado.
+# B - El endpoint lo define Flask como la concatenación del nombre del Blueprint y de la Funcion
+# C - URL Path - Asocia la url (viene del base.html) a la funcion "prestaciones"
