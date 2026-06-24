@@ -2,7 +2,6 @@ from . import bp
 from flask import render_template, request, redirect, url_for, flash, session, current_app
 from app.config.navigation import main_sections
 
-
 @bp.route("/login", methods=["GET"], endpoint="login_form")
 def login_form():
     return render_template("auth/login.html")
@@ -11,22 +10,26 @@ def login_form():
 def login_post():
     username = request.form.get("username")
     password = request.form.get("password")
-
-    print("Login post:", username, password)
+    # print("Login post:", username, password)
 
     try:
         user = current_app.auth_service.login(username, password)
-        print("login ok", user)
-
+        # print("login ok", user)
         session["user_id"] = user.id
         session["username"] = user.username
         session["role"] = user.role
 
-        flash("Inicio de sesión correcta.", "success")
+        flash("Inicio de sesión correcta.", "login")
+        next_url = request.form.get("next") # Recuperamos el "next" que viene del decorador
+
+        if next_url:
+            return redirect(next_url)
+
         return redirect(url_for("main.home"))
+
     except ValueError as e:
-        print("login error", e)
-        flash(str(e), "warning")
+        # print("login error", e)
+        flash(str(e), "login-error")
         return redirect(url_for("auth.login_form"))
 
 @bp.route("/logout", methods=["GET"], endpoint="logout")

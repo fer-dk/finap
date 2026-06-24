@@ -2,30 +2,67 @@
 export function initNavToggle() {
   const buttons = document.querySelectorAll(".mobile-nav-toggle"); //A
   const navMenu = document.querySelector("#navmenu"); //B
-  if (!navMenu || buttons.length === 0) return; //C
+  const header = document.querySelector("#header");
+  if (!navMenu || buttons.length === 0 || !header) return; //C
 
   // Función que actualiza los íconos según el estado del menú
   // Recibe: isOpen (true si el menú quedó abierto)
   const syncIcons = (isOpen) => {
-    buttons.forEach((btn) => { //D
+    buttons.forEach((btn) => {
+      //D
       btn.classList.toggle("bi-list", !isOpen); //E
-      btn.classList.toggle("bi-x", isOpen);//F
+      btn.classList.toggle("bi-x", isOpen); //F
     });
   };
 
+  // Mantener padding del body según altura real del header y del nav abierto
+  let baseHeaderHeight = header.offsetHeight;
+
+  const updateBodyPadding = (extra = 0) => {
+    document.body.style.paddingTop = `${baseHeaderHeight + extra}px`;
+  };
+
+  const recalcHeader = () => {
+    baseHeaderHeight = header.offsetHeight;
+    if (document.body.classList.contains("mobile-nav-active")) {
+      updateBodyPadding(navMenu.offsetHeight);
+    } else {
+      updateBodyPadding(0);
+    }
+  };
+
+  // Inicializar padding
+  recalcHeader();
+
+  // Escuchar cambios de tamaño
+  window.addEventListener("resize", recalcHeader);
+
+  // ResizeObserver para cambios internos dinámicos
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(recalcHeader);
+    ro.observe(header);
+    ro.observe(navMenu);
+  }
+
   // Función principal de toggle (abrir/cerrar menú)
   const toggle = () => {
-    const isOpen = document.body.classList.toggle("mobile-nav-active");//G
+    const isOpen = document.body.classList.toggle("mobile-nav-active"); //G
     navMenu.classList.toggle("navmenu-open", isOpen); //H
     syncIcons(isOpen); //I
+    if (isOpen) {
+      updateBodyPadding(navMenu.offsetHeight);
+    } else {
+      updateBodyPadding(0);
+    }
   };
 
   // Cuando el usuario hace click en cualquier botón, ejecutamos toggle().
   buttons.forEach((btn) => btn.addEventListener("click", toggle));
-  navMenu.querySelectorAll("a").forEach((link) => { //J
-    link.addEventListener("click", () => { //K
-      if (document.body.classList.contains("mobile-nav-active"))
-        toggle();//M
+  navMenu.querySelectorAll("a").forEach((link) => {
+    //J
+    link.addEventListener("click", () => {
+      //K
+      if (document.body.classList.contains("mobile-nav-active")) toggle(); //M
     });
   });
 }

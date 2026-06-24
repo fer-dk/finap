@@ -7,43 +7,57 @@
 
   {% block content %}
 
-    <h4>Formulario Insertar prestación</h4>
-    <form method="POST" action="{{ url_for('prestaciones.prestacion_insert')}}">
-      <label for="nombre">Nombre de la prestación</label><br>
-      <input required type="text" id="nombre" name="nombrePrestacion" />
-      <button type="submit">Insertar</button>
-    </form>
+
+  <section class="container prestaciones-page">
+    <h4 class="mb-4 text-primary">Creador de prestación</h4>
+    <div class="row">
+      <div class="col-12 col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <form method="POST" action="{{ url_for('prestaciones.prestacion_insert')}}">
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre de la prestación</label>
+                <input class="form-control" required type="text" id="nombre" name="nombrePrestacion" />
+              </div>
+              <button type="submit" class="btn btn-primary">Insertar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- #A -->
-    {% with mensajes = get_flashed_messages(with_categories=true) %}
-      {% if mensajes %}
-        {% for categoria, mensaje in mensajes %}
-        <div class="alert alert-{{ 'success' if categoria == 'success' else 'warning'}} mt-3">
-          {{ mensaje }}
+    {% with messages = get_flashed_messages(with_categories=true, category_filter=['success', 'warning']) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'warning'}} mt-3">
+          {{ message }}
         </div>
         {% endfor %}
       {% endif %}
     {% endwith %}
 
-    <p style="margin-top:10px;">
+    <p>
       <a href="{{ url_for('logs.logs_listar')}}">Ver logs</a>
     </p>
 
-    <p style="margin-top:10px;">
-      <a href="/crearTablaPrestaciones">Crear Tabla Prestaciones</a>
-    </p>
 
-    <p style="margin-top:10px;">
+    <p>
       <a href="/listarTablas">Ver tablas</a>
     </p>
 
+</section>
 
   {% endblock %}
 
   <!-- #A
-    "with" crea una variable temporal mensajes y guarda el resultado de la funcion flask "get_flashed_messages"
-    como la variable "with_categories" es True, el resultado devuelve una tupla.
-    "mensaje y categoria" se definen en el "for". Del mensaje definido en el flash del blueprint "prestaciones",
-    "cagegoria" tomará el segundo parametro del resultado de la tupla (ej success) y
-    "mensaje" tomará el segundo parametro (el mensaje en si).
+    "with" crea una variable temporal(parametro opcional de la funcion) "messages"
+    y guarda el resultado de la funcion flask "get_flashed_messages".
+
+    Como la variable "with_categories" es True, el resultado devuelve una lista de tuplas.
+    "messages y categorie" se definen en el "for".
+    Si
+    Del mensaje definido en el flash del blueprint "prestaciones".
+    "categorie" tomará el primer parametro del resultado de la tupla (ej success) y
+    "menssage" tomará el segundo parametro (el mensaje en si).
   -->

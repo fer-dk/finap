@@ -1,21 +1,42 @@
 <nav id="navmenu" class="navmenu">
+
+
   <ul>
     {% for item in nav_items %}
       <li>  <!-- A -->
-         <a href="{{ url_for(item.endpoint) }}" 
-            class="{% if request.endpoint == item.endpoint %}active{% endif %}"> 
+         <a href="{{ url_for(item.endpoint) }}"
+            class="{% if request.endpoint == item.endpoint %}active{% endif %}">
             {{ item.label }}
         </a>
       </li>
     {% endfor %}
   </ul>
 
+  <div class="auth-nav ms-auto">  <!-- B -->
+    {% if session.get("user_id") %}
+
+      <span class="auth-user">
+        {{ session.get("username") }}
+        {% if session.get("role") %}   <!-- El if No seria necesario, pero, por para mayor protección -->
+        ({{ session.get("role") }})
+        {% endif %}
+      </span>
+
+      <a class="auth-link" href="{{ url_for('auth.logout')}}">
+        Salir
+      </a>
+
+    {% else %}
+      <a href="{{ url_for('auth.login_form') }}"
+        class="auth-link {% if request.endpoint == 'auth.login_form' %}active{% endif %}">
+        Iniciar Sesión
+      </a>
+    {% endif %}
+  </div>
 </nav>
 
 
-<!-- A - Si el endpoint actual (la vista que se esta ejecutando) coincide con el enpoint del item del menu, Flask
-        Inyecta la palabra active dentro del atributo class. Sin active no habria forma de q CSS sepa cual link
-        pertenece a la pagina que esta abierta. Sirve para diferenciar el item del menu actual y estilizarlo
-        distinto del resto, sin hover. 
--->
 
+<!-- A - Si el endpoint actual (la vista que se esta ejecutando) coincide con el enpoint del item del menu, Flask
+        Inyecta la linea HTML "<a href="/prestacion" class="active">".Active es una clase arbitraria css.
+-->

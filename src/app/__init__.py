@@ -30,6 +30,7 @@ from app.application.auth_service import AuthService
 def create_app():
     # Instancia de Flask
     app = Flask(__name__, instance_relative_config=True)
+
     # Busca en el sistema una variable llamada APP_ENV
     env = os.environ.get("APP_ENV", "MacDevMySqlConfig")
 
@@ -83,9 +84,9 @@ def create_app():
         if nav_items is None:
             nav_items = navbars.get("main", [])
         return dict(
-            main_sections=main_sections, # "main_sections": main_sections - resultado "Prestaciones"
-            nav_items=nav_items,    # resultado "Listar"
-            current_bp= bp_name     # resultado "prestaciones"
+            main_sections=main_sections,
+            nav_items=nav_items,
+            current_bp= bp_name
         )
 
     return app

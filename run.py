@@ -18,7 +18,7 @@ def abrir_navegador():
 
 if __name__ == "__main__":
     # Decide Modo
-    mode = os.getenv("APP_MODE", "production").lower() # cambiar a "production" o "developtment"
+    mode = os.getenv("APP_MODE", "development").lower() # cambiar a "production" o "developtment"
     debug = (mode == "development")
 
     print(f"[INFO] Modo: {mode.upper()}")

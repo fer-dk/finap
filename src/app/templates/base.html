@@ -34,11 +34,14 @@
       </a>
       <!-- Nav dinámico -->
       {% block navbar %}
-      {% include "components/_navbar.html" %}
+        {% if request.endpoint != "auth.login_form" %}
+          {% include "components/_navbar.html" %}
+        {% endif %}
       {% endblock %}
 
-      <!-- A - Icono menú móvil (como en Axis) -->
-      <i class="mobile-nav-toggle bi bi-list"></i>
+      {% if request.endpoint != "auth.login_form" %}
+        <i class="mobile-nav-toggle bi bi-list"></i> <!-- A - Icono menú móvil (como en Axis) -->
+      {% endif %}
 
       <div class="d-none d-lg-flex ms-5 logo-anses-wrapper">
         <img src="{{url_for('static', filename='img/anses_blanco.png')}}" alt="Logo ANSES"
@@ -48,6 +51,19 @@
   </header>
 
   <main class="mt-4">
+
+    {% with messages= get_flashed_messages(with_categories=true, category_filter=['login']) %}
+      {% if messages  %}
+        <div class="container login-flash-container">
+          {% for category, message in messages %}
+            <div class="alert alert-success mt-3">
+              {{message}}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
   </main>
 

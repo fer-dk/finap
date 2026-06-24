@@ -3,7 +3,7 @@
 {% block title%}Login{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 420px;">
+<div class="container mt-5 mb-5" style="max-width: 420px;">
     <h2 class="mb-4">Iniciar Sesión</h2>
 
     <form method="POST" action="{{ url_for('auth.login_post') }}">
@@ -16,20 +16,30 @@
             <label for="password" class="form-label">Contraseña</label>
             <input type="password" class="form-control" id="password" name="password">
         </div>
+
+        <!-- A - "Hidden Inputs" -->
+        <input type="hidden" name="next" value="{{ request.args.get('next',  '') }}">
+
         <button type="submit" class="btn btn-primary">Ingresar</button>
     </form>
+
+<!-- Muesta solo mensaje de error, el mensaje success se encuentra en el base.html -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for categorie, message in messages %}
+            <div class="alert alert-{{ 'success' if categorie == 'success' else 'warning'}} mt-3">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
 </div>
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for categorie, message in messages %}
-        <div class="alert alert-{{ 'success' if categorie == 'success' else 'warning'}} mt-3">
-            {{ message }}
-        </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
 {% endblock %}
 
 
+<!-- A - Elemento invisible que envia dato dentro del POST.
+    Si el login tiene origen en la seccion Prestaciones, el routes.py
+    Flask procesará el dato atraves del metodo request.form (en la variable next_url)
+    EL fin es redirifir al usuario una vez loguedao a la seccion directo
+-->
