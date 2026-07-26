@@ -46,6 +46,7 @@ def api_listar_prestacion():
 
     return jsonify(data), 200
 
-# A - el request ya no llega al caso de uso si el usuario no está autenticado.
+# A - El request ya no llega al caso de uso si el usuario no está autenticado.
+#     Capa intermedia entre la petición HTTP y la función real de la ruta.
 # B - El endpoint lo define Flask como la concatenación del nombre del Blueprint y de la Funcion
 # C - URL Path - Asocia la url (viene del base.html) a la funcion "prestaciones"

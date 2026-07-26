@@ -3,8 +3,7 @@ import os
 
 app = create_app() # usamos la factory
 
-def _read_version() -> str: # A
-    #Buscamos el directorio donde se encuentra wsgi.py
+def _read_version() -> str: # A Buscamos el directorio donde se encuentra wsgi.py
     base_dir = os.path.dirname(os.path.abspath(__file__)) # B
     version_path = os.path.join(base_dir, "VERSION.txt") # C
 

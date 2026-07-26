@@ -1,22 +1,18 @@
 # Patrón utilizado - Application Factory / factory modular:
 #   Permite registrar blueprints, tambien usar tests o configs por entorno
-#   Evita importaciones circulares
-#   Podés crear varias instancias de la app
-
+#   Evita importaciones circulares y Podés crear varias instancias de la app
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import os
-from app.config import MacDevMySqlConfig, MacSqliteConfig
+from app.config import DevMysql, DevLite, DevMigrationMysql
 
-# --- Extensión global ---
+# --- Inicializamos Extensiones globales ---
 db = SQLAlchemy()
+migrate = Migrate()
 
-# --- Modelos ORM ---
-# para que db.create_all() cree la tabla.
-from app.infrastructure.models.prestacion_model import PrestacionModel
-from app.infrastructure.models.log_model import LogModel
-from app.infrastructure.models.user_model import UserModel
-
+# --- Modelos ---
+from app.infrastructure import models # importa y registra las tablas
 # --- Repos ---
 from app.infrastructure.log_repo import LogRepo
 from app.infrastructure.prestacion_repo import PrestacionRepo
@@ -26,39 +22,40 @@ from app.application.log_service import LogService
 from app.application.prestacion_service import PrestacionService
 from app.application.auth_service import AuthService
 
-# la siguiente funcion crea un objeto Flask
+# Construye y devuelve una instancia de Flask configurada
 def create_app():
-    # Instancia de Flask
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True) # Instancia de Flask
 
-    # Busca en el sistema una variable llamada APP_ENV
-    env = os.environ.get("APP_ENV", "MacDevMySqlConfig")
+    env = os.environ.get("APP_ENV", "DevMysql") # Busca en el sistema APP_ENV
 
     config_map = {
-        "MacDevMySqlConfig": MacDevMySqlConfig,
-        "MacSqliteConfig": MacSqliteConfig
+        "DevMysql": DevMysql,
+        "DevLite": DevLite,
+        "DevMigrationMysql": DevMigrationMysql
     }
 
-    app.config.from_object(config_map.get(env, MacDevMySqlConfig))
-    # app.config["EXPLAIN_TEMPLATE_LOADING"] = True
+    config_class = config_map.get(env) # Bloque de seguridad
+    if config_map is None:
+        raise ValueError(
+            f"Configuracion desconocida en APP_ENV {env}"
+        )
 
-    db.init_app(app) # Inicializar extensión con la app
+    app.config.from_object(config_class) # Elige configuración
 
-    with app.app_context():
-        db.create_all()
+    db.init_app(app) # conecta SQLAlchemy con Flask
+    migrate.init_app(app, db) # conecta Flask-Migrate y registra comondo "db"
 
-    # === Inyeccion de dependencias ===
-    # ADAPTADOR (definicion)
+    # ADAPTADORES (definicion) === Inyeccion de dependencias ===
     app.log_repo = LogRepo(db)
     app.prestacion_repo = PrestacionRepo(db)
     app.user_repo = UserRepo(db)
 
-    # Crear Servicios
+    # Servicios
     app.log_service = LogService(app.log_repo)
     app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo, db)
     app.auth_service = AuthService(app.user_repo, db)
 
-    # === Registrar blueprints ===
+    # Registrar Blueprints
     from app.blueprints.main import bp as main_bp
     app.register_blueprint(main_bp, url_prefix="")
 
