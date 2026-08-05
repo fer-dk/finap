@@ -32,3 +32,41 @@ class UserModel(db.Model):
         db.String(255),
         nullable=False
     )
+
+    # cuando fue creada la cuenta
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        server_default=db.func.now() # valor automatico
+    )
+
+    # ultima modificacion del usuario
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        server_default=db.func.now(),
+        onupdate=db.func.now()
+    )
+
+    # Actualiza cuando el usuario inicia session correctamente
+    # AuthService deberá actualizarlo explícitamente después de autenticar correctamente.
+    last_login_at = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+    first_name = db.Column(
+        db.String(80),
+        nullable=False
+    )
+
+    last_name = db.Column(
+        db.String(80),
+        nullable=False
+    )
+
+    email = db.Column(
+        db.String(255),
+        nullable=False,
+        unique=True
+    )

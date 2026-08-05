@@ -10,11 +10,9 @@ def login_form():
 def login_post():
     username = request.form.get("username")
     password = request.form.get("password")
-    # print("Login post:", username, password)
 
     try:
         user = current_app.auth_service.login(username, password)
-        # print("login ok", user)
         session["user_id"] = user.id
         session["username"] = user.username
         session["role"] = user.role
