@@ -1,8 +1,8 @@
 from . import bp
 from flask import render_template, current_app
 
-@bp.route("/logs", methods=["GET"], endpoint="logs_listar")
-def listar_logs():
+@bp.route("/logs", methods=["GET"], endpoint="logs_list")
+def list_logs():
     service = current_app.log_service
-    registros = service.listar()
-    return render_template("logs/logs.html", registros = registros)
+    records = service.list()
+    return render_template("logs/logs.html", records = records)

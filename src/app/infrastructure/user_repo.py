@@ -1,9 +1,8 @@
 from app.domain.entities.user import User
+from app.domain.entities.user_credentials import UserCredentials
 from app.domain.ports import UserRepoPort
 from app.infrastructure.models.user_model import UserModel
-from app.domain.entities.user_credentials import UserCredentials
 
-#userrepo = UserRepo(db)
 class UserRepo(UserRepoPort):
     def __init__(self, db):
         self.db = db
@@ -21,11 +20,16 @@ class UserRepo(UserRepoPort):
             is_active = user_model.is_active
         )
 
+    def create_user(self, user:User, password_hash:str) -> User:
+        user_model = UserModel(
+            id=user.id,
+            username=user.username,
+            role=user.role,
+            is_active=user.is_active,
+            password_hash=password_hash
+            )
 
-    def create_user(self, username:str, password_hash:str, role:str = "user" ) -> User: #B
-        user_model = UserModel(username=username, password_hash=password_hash, role=role, is_active=True)
         self.db.session.add(user_model)
-        self.db.session.flush()
 
         return User(
             id = user_model.id,
@@ -49,16 +53,10 @@ class UserRepo(UserRepoPort):
 
         return UserCredentials(user=user, password_hash=user_model.password_hash)
 
-
-
-
-
-
 # A - NO pasamos como parametro una entidad User, ya que al pedir sólo el username
 #     no tiene sentido construir una entidad sabiendo que para "buscar" solo necesitamos username
 
-# B - Porque no pasamos como parametro a la entidad "User" directamente?
-#     Debido a que la entidad 'NO' tiene password_hash, entonces conceptualmente
-#     estamos separando "hash" infraestructura/seguridad de la entidad de negocio
-#     User mezcla "Dominio - Autenticación - Seguridad" por eso lo separamos en:
-#     "User - Credentials - Auth"
+# Al haber migrado a la filosofía de UUIDs, el ID de tipo cadena ya viene creado y
+# listo desde el corazón del Dominio (la entidad User). Como el repositorio ya conoce la identidad definitiva
+# del usuario antes de guardarlo, no tiene ninguna necesidad de interrumpir el flujo
+# para preguntarle a SQLite qué número le va a tocar.

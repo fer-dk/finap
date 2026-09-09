@@ -1,8 +1,8 @@
 from app.domain.ports import LogsRepoPort
 
 class LogService:
-    def __init__(self, repo:LogsRepoPort):
-        self.repo = repo
+    def __init__(self, repoPort:LogsRepoPort):
+        self.repoLog = repoPort
 
-    def listar(self):
-        return self.repo.listar()
+    def list(self):
+        return self.repoLog.list()

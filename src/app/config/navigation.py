@@ -8,7 +8,7 @@ main_sections = [
                  },
                 {
                     "name": "Logueos",
-                    "endpoint": "logs.logs_listar",
+                    "endpoint": "logs.logs_list",
                     "description": "Listado de logueos por legajo - referidos a la prestación creada"}
                 ]
 
@@ -17,9 +17,9 @@ navbars = {
             "prestaciones" :
                 [
                 {"label": "Crear",      "endpoint": "prestaciones.prestacion_form"},
-                {"label": "Ver Tablas", "endpoint": "logs.logs_listar"}
+                {"label": "Ver Tablas", "endpoint": "logs.logs_list"}
                 ],
-            "logs": [{"label": "Logueos",    "endpoint": "logs.logs_listar"}]
+            "logs": [{"label": "Logueos",    "endpoint": "logs.logs_list"}]
 }
 
 #def navbar_for(blueprint_name: str):

@@ -1,33 +1,32 @@
 #APLICACION
 import getpass
+from app.domain.entities.log import Log
 from app.domain.entities.prestacion import Prestacion
-from app.domain.ports import PrestacionRepoPort, LogsRepoPort
+from app.domain.ports import PrestacionRepoPort, LogsRepoPort, UnitOfWorkPort
 
-# Servicio de aplicación = capa de CASOS DE USO
 class PrestacionService:
-    def __init__(self, repoPrest: PrestacionRepoPort, repoLogs: LogsRepoPort, db): # A <--- Implementa el puerto
-        self.prest = repoPrest
-        self.logs = repoLogs
-        self.db = db
+    def __init__(self, prest: PrestacionRepoPort, log: LogsRepoPort, uow: UnitOfWorkPort): # A <--- Implementa el puerto
+        self.repoPrest = prest
+        self.repologs = log
+        self.repoUow = uow
 
     # Caso de uso: Crear prestación
-    def crear(self, name:str) -> Prestacion:
+    def create(self, name:str) -> Prestacion:
         try:
             prestacion = Prestacion(name = name)
+            log = Log(user=getpass.getuser(), action=f"Inserción Prestación({prestacion.name})")
+            self.repologs.register(log)
 
-            self.logs.registrar(
-                user=getpass.getuser(),
-                action=f"Inserción Prestación ({prestacion.name})")
+            new_prestacion = self.repoPrest.insert(prestacion) # Aqui el service recibe y devuelve el modelo de dominio
+            self.repoUow.commit()
 
-            nueva_prestacion = self.prest.insertar(prestacion) # Aquí el service recibe y devuelve el modelo de dominio
-            self.db.session.commit() # Service decide las transaccion completa
-            return nueva_prestacion
+            return new_prestacion
 
         except Exception:
-            self.db.session.rollback()
+            self.repoUow.rollback()
             raise
 
-    def listar(self):
-        return self.prest.listar()
+    def list(self):
+        return self.prest.list()
 
 # A - "Recibo un objeto (repoPrest) que tiene la forma del Puerto."

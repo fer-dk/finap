@@ -10,14 +10,14 @@ from app.config import DevMysql, DevLite, DevMigrationMysql
 # --- Inicializamos Extensiones globales ---
 db = SQLAlchemy()
 migrate = Migrate()
-
-# --- Modelos ---
+# --- Models ---
 from app.infrastructure import models # importa y registra las tablas
-# --- Repos ---
+# --- Repos y port ---
+from app.infrastructure.unit_of_work import Uowork
 from app.infrastructure.log_repo import LogRepo
 from app.infrastructure.prestacion_repo import PrestacionRepo
 from app.infrastructure.user_repo import UserRepo
-# --- Servicios ---
+# --- Services ---
 from app.application.log_service import LogService
 from app.application.prestacion_service import PrestacionService
 from app.application.auth_service import AuthService
@@ -48,12 +48,13 @@ def create_app():
     # ADAPTADORES (definicion) === Inyeccion de dependencias ===
     app.log_repo = LogRepo(db)
     app.prestacion_repo = PrestacionRepo(db)
+    app.uow_repo = Uowork(db)
     app.user_repo = UserRepo(db)
 
     # Servicios
     app.log_service = LogService(app.log_repo)
-    app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo, db)
-    app.auth_service = AuthService(app.user_repo, db)
+    app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo, app.uow_repo)
+    app.auth_service = AuthService(app.user_repo, app.uow_repo)
 
     # Registrar Blueprints
     from app.blueprints.main import bp as main_bp
@@ -74,22 +75,16 @@ def create_app():
     # === Context Processor inyecta menus a todas las plantillas ===
     from app.config.navigation import main_sections, navbars
 
-    @app.context_processor # A
+    @app.context_processor
     def inject_navigation():
-        bp_name = request.blueprint or "main" # aquí Flask reconoce de que blueprint viene la ruta actual (en que modulo está usuario). Es un atajo de un if pero no es un if
-        nav_items = navbars.get(bp_name) # busca en el diccionario "navbar" de navigation.py al blueprint
+        bp_name = request.blueprint or "main"
+        nav_items = navbars.get(bp_name)
         if nav_items is None:
             nav_items = navbars.get("main", [])
-        return dict(
+        return dict( #  retorna un diccionario con claves, inyectandolas al contexto jinja
             main_sections=main_sections,
             nav_items=nav_items,
             current_bp= bp_name
         )
 
     return app
-
-# A - # Context processor es una funcion especial que retorna un diccionario con claves,
-      # esas claves las inyecta como variables globales al contexto de Jinja.
-      # En vez de pasar manualmente las variables en cada render_template(),
-      # automaticamente tiene acceso a ellas con contextprocessor.
-      # Ventajas: No duplicamos includes ni pasamos manualmente listas desde cada controlador.

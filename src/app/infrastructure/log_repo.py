@@ -3,37 +3,35 @@ from app.domain.entities.log import Log
 from app.domain.ports import LogsRepoPort
 from app.infrastructure.models.log_model import LogModel
 
+
 class LogRepo(LogsRepoPort):
     def __init__(self, db):
         self.db = db
 
-    def registrar(self, user: str, action: str):
-        nuevo_log = LogModel(user=user, action=action, datetime = datetime.now())
-        self.db.session.add(nuevo_log) # no hacemos commit pq depende de insertar()
+    def register(self, log: Log) -> Log:
+        # 1. Creas el modelo
+        log_model = LogModel(id=log.id, user=log.user, action=log.action, datetime=log.datetime)
+        # 2. Guardas en la sesión y empujas el cambio para obtener el ID secuencial
+        self.db.session.add(log_model)
+        # 3. Retornas una ENTIDAD con el ID real
+        return Log(
+            id=log_model.id,
+            user=log_model.user,
+            action=log_model.action,
+            dt_at=log_model.datetime
+        )
 
-    def listar(self) -> list[Log]: #A
-        filas = LogModel.query.order_by(LogModel.id.desc()).all()
+    def list(self) -> list[Log]: #A
+        rows = LogModel.query.order_by(LogModel.id.desc()).all()
         logs: list[Log] = []
 
-        # Convertimos filas en instancias del modelo
-        # "El repositorio siempre debe devolver OBJETOS del dominio, no tuplas crudas"
-        for fila in filas: #B
+        for row in rows: #B
             log = Log(
-                id=fila.id,
-                user=fila.user,
-                action=fila.action,
-                datetime=fila.datetime
+                id=row.id,
+                user=row.user,
+                action=row.action,
+                dt_at=row.datetime # 'dt_at' es el parametro del constructor Logy 'row.datetime' es la columna de la DB
             )
             logs.append(log)
 
         return logs
-
-# A -  "-> list[Log]"": Indica que el valor de retorno del método será una lista
-#      y que cada elemento dentro de esa lista será un objeto de la clase Log
-
-# B -  Aqui estamos construyendo los parametros que vamos a pasar al constructor.
-#      Entonces las variables dentro de log() deben tener el mismo nombre
-#      que los parametros definidos en el constructor
-#      Por cada fila crea un objeto log
-#      Todos los objetos se guardan en una lista
-#      1 lista de objeto x sql

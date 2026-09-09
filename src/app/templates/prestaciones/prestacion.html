@@ -17,7 +17,7 @@
             <form method="POST" action="{{ url_for('prestaciones.prestacion_insert')}}">
               <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre de la prestación</label>
-                <input class="form-control" required type="text" id="nombre" name="nombrePrestacion" />
+                <input class="form-control" required type="text" id="nombre" name="namePrestacion" />
               </div>
               <button type="submit" class="btn btn-primary">Insertar</button>
             </form>
@@ -38,7 +38,7 @@
     {% endwith %}
 
     <p>
-      <a href="{{ url_for('logs.logs_listar')}}">Ver logs</a>
+      <a href="{{ url_for('logs.logs_list')}}">Ver logs</a>
     </p>
 
 
