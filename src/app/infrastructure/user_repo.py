@@ -16,6 +16,9 @@ class UserRepo(UserRepoPort):
         return User(
             id = user_model.id,
             username = user_model.username,
+            first_name = user_model.first_name,
+            last_name=user_model.last_name,
+            email=user_model.email,
             role = user_model.role,
             is_active = user_model.is_active
         )
@@ -24,19 +27,16 @@ class UserRepo(UserRepoPort):
         user_model = UserModel(
             id=user.id,
             username=user.username,
+            first_name=user.firstname,
+            last_name=user.lastname,
+            email=user.email,
             role=user.role,
             is_active=user.is_active,
             password_hash=password_hash
             )
 
         self.db.session.add(user_model)
-
-        return User(
-            id = user_model.id,
-            username = user_model.username,
-            role = user_model.role,
-            is_active = user_model.is_active
-        )
+        return user
 
     def find_credentials_by_username(self, username: str) -> UserCredentials | None:
         user_model = UserModel.query.filter_by(username = username).first()
@@ -47,6 +47,9 @@ class UserRepo(UserRepoPort):
         user = User(
             id = user_model.id,
             username = user_model.username,
+            first_name = user_model.first_name,
+            last_name=user_model.last_name,
+            email=user_model.email,
             role = user_model.role,
             is_active = user_model.is_active
         )

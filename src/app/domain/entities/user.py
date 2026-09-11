@@ -3,19 +3,38 @@ from uuid import UUID, uuid4
 class User():
     def __init__(
         self,
-        id:UUID | None = None,
-        username:str = "",
-        role:str = "",
-        is_active: bool = True
+        username:str,
+        first_name:str,
+        last_name:str,
+        email:str,
+        role:str = "user",
+        is_active: bool = True,
+        id:UUID | None = None
         ):
 
         username_clean = (username or "").strip()
+        first_name_clean = (first_name or "").strip()
+        last_name_clean = (last_name or "").strip()
+        email_clean = (email or "").strip()
+        role_clean = (role or "").strip().lower()
+
         if not username_clean:
             raise ValueError("El usuario es obligatorio")
+        if not first_name_clean:
+            raise ValueError("El nombre es obligatorio")
+        if not last_name_clean:
+            raise ValueError("El apellido es obligatorio")
+        if not email_clean:
+            raise ValueError("El email es obligatorio")
+        if role_clean not in {"user", "admin"}:
+            raise ValueError("Rol inválido")
 
         self.id= id or uuid4()
         self.username= username_clean
-        self.role= role
+        self.firstname= first_name_clean
+        self.lastname= last_name_clean
+        self.email= email_clean
+        self.role= role_clean
         self.is_active= is_active
 
     def activeControl(self) -> bool:

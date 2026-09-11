@@ -7,14 +7,29 @@ class AuthService:
         self.repoUser = user
         self.repoUow = uow
 
-    def register_user(self,username: str, password: str, role: str = "user" ) -> User:
-        # Reglas de autenticación
+    def register_user(
+            self,
+            username: str,
+            password: str,
+            first_name: str,
+            last_name:str,
+            email:str,
+            role: str = "user") -> User:
+
+        # Reglas de autenticación (que necesitan infraestructura)
         if not password:
             raise ValueError("La contraseña es obligatoria.")
         if self.repoUser.find_by_username(username):
             raise ValueError("El usuario ya existe.")
 
-        user_new = User(username=username, role=role) # valida el username ingresado
+        user_new = User(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            role=role
+            )
+
         password_hash = generate_password_hash(password)
 
         # Retorno
