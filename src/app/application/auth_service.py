@@ -47,17 +47,17 @@ class AuthService:
         # El dominio solo valida objetos completos, no textos sueltos de un formulario
         username = (username or "").strip()
         if not username or not password: # A
-            raise ValueError("Usuario o contraseña inválidos1")
+            raise ValueError("Usuario o contraseña inválidos")
 
         # Reglas de autenticación para credenciales
         credentials = self.repoUser.find_credentials_by_username(username)
         if credentials is None:
-            raise ValueError("Usuario o contraseña inválidos.2")
+            raise ValueError("Usuario o contraseña inválidos")
         if not credentials.user.activeControl():
             raise ValueError("Usuario inactivo.")
         # Cuando el usuario es correcto compara el password ingresado vs password hasheado
         if not credentials.passControl(password):
-            raise ValueError("Usuario o contraseña invalidos.3")
+            raise ValueError("Usuario o contraseña invalidos")
 
         return credentials.user
 

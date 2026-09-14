@@ -12,7 +12,7 @@
     <!-- Font Navbar -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Main -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -52,7 +52,7 @@
 
   <main class="mt-4">
 
-    {% with messages= get_flashed_messages(with_categories=true, category_filter=['login']) %}
+    {% with messages= get_flashed_messages(with_categories=true, category_filter=['success', 'warning', 'info']) %}
       {% if messages  %}
         <div class="container login-flash-container">
           {% for category, message in messages %}

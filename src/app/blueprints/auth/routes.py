@@ -17,7 +17,7 @@ def login_post():
         session["username"] = user.username
         session["role"] = user.role
 
-        flash("Inicio de sesión correcta.", "login")
+        flash("Inicio de sesión correcta.", "success")
         next_url = request.form.get("next") # Recuperamos el "next" que viene del decorador
 
         if next_url:
@@ -26,13 +26,12 @@ def login_post():
         return redirect(url_for("main.home"))
 
     except ValueError as e:
-        # print("login error", e)
         flash(str(e), "login-error")
         return redirect(url_for("auth.login_form"))
 
 @bp.route("/logout", methods=["GET"], endpoint="logout")
 def logout():
     session.clear()
-    flash("Sesión cerrada", "info")
+    flash("Sesión cerrada con éxito", "info")
     return redirect(url_for("auth.login_form"))
 
