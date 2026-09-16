@@ -4,9 +4,16 @@
 
 {% block content %}
 <div class="container mt-5 mb-5" style="max-width: 420px;">
+    <a class="login-back-link" href="{{ url_for('main.home') }}" aria-label="Volver">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-back-icon" aria-hidden="true">
+            <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        Volver
+    </a>
+
     <div class="login-header">
         <div class="login-icon-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
         </div>
         <h2 class="login-title">Finanzas</h2>
         <p class="login-description">Ingrese su usuario y mail. En caso de necesitar registrarse contactarse con el administrador</p>

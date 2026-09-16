@@ -56,7 +56,7 @@
       {% if messages  %}
         <div class="container login-flash-container">
           {% for category, message in messages %}
-            <div class="alert alert-success mt-3">
+            <div class="alert alert-{{category}} mt-3">
               {{message}}
             </div>
           {% endfor %}

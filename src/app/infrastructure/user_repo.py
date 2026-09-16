@@ -56,6 +56,41 @@ class UserRepo(UserRepoPort):
 
         return UserCredentials(user=user, password_hash=user_model.password_hash)
 
+    def find_by_email(self, email) -> User | None:
+        user_model = UserModel.query.filter_by(email=email).first()
+
+        if user_model is None:
+            return None
+
+        return User(
+            id = user_model.id,
+            username = user_model.username,
+            first_name = user_model.first_name,
+            last_name=user_model.last_name,
+            email=user_model.email,
+            role = user_model.role,
+            is_active = user_model.is_active
+        )
+
+    def list_users(self) -> list[User]:
+        rows = UserModel.query.order_by(UserModel.id.desc()).all()
+        users : list[User] = []
+
+        for row in rows:
+            user = User(
+                username=row.username,
+                first_name=row.first_name,
+                last_name=row.last_name,
+                email=row.email,
+                role=row.role,
+                is_active=row.is_active,
+                id=row.id
+            )
+
+            users.append(user)
+
+        return users
+
 # A - NO pasamos como parametro una entidad User, ya que al pedir sólo el username
 #     no tiene sentido construir una entidad sabiendo que para "buscar" solo necesitamos username
 

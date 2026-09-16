@@ -21,6 +21,7 @@ from app.infrastructure.user_repo import UserRepo
 from app.application.log_service import LogService
 from app.application.prestacion_service import PrestacionService
 from app.application.auth_service import AuthService
+from app.application.user_service import UserService
 
 # Construye y devuelve una instancia de Flask configurada
 def create_app():
@@ -54,7 +55,8 @@ def create_app():
     # Servicios
     app.log_service = LogService(app.log_repo)
     app.prestacion_service = PrestacionService(app.prestacion_repo,app.log_repo, app.uow_repo)
-    app.auth_service = AuthService(app.user_repo, app.uow_repo)
+    app.auth_service = AuthService(app.user_repo)
+    app.user_service = UserService(app.user_repo, app.uow_repo)
 
     # Registrar Blueprints
     from app.blueprints.main import bp as main_bp
@@ -70,7 +72,10 @@ def create_app():
     app.register_blueprint(api_bp)
 
     from app.blueprints.auth import bp as auth_bp
-    app.register_blueprint(auth_bp, url_prefix="" )
+    app.register_blueprint(auth_bp)
+
+    from app.blueprints.users import bp as users_bp
+    app.register_blueprint(users_bp)
 
     # === Context Processor inyecta menus a todas las plantillas ===
     from app.config.navigation import main_sections, navbars

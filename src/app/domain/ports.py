@@ -36,6 +36,14 @@ class UserRepoPort(ABC):
     def find_credentials_by_username(self, username: str) -> UserCredentials:
         pass
 
+    @abstractmethod
+    def find_by_email(self, username:str) -> User:
+        pass
+
+    @abstractmethod
+    def list_users(self) -> list[User]:
+        pass
+
 class UnitOfWorkPort(ABC):
     @abstractmethod
     def commit(self) -> None:

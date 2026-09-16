@@ -18,21 +18,16 @@ class User():
         email_clean = (email or "").strip()
         role_clean = (role or "").strip().lower()
 
-        if not username_clean:
-            raise ValueError("El usuario es obligatorio")
-        if not first_name_clean:
-            raise ValueError("El nombre es obligatorio")
-        if not last_name_clean:
-            raise ValueError("El apellido es obligatorio")
-        if not email_clean:
-            raise ValueError("El email es obligatorio")
-        if role_clean not in {"user", "admin"}:
-            raise ValueError("Rol inválido")
+        if not username_clean: raise ValueError("El usuario es obligatorio")
+        if not first_name_clean: raise ValueError("El nombre es obligatorio")
+        if not last_name_clean: raise ValueError("El apellido es obligatorio")
+        if not email_clean: raise ValueError("El email es obligatorio")
+        if role_clean not in {"user", "admin"}: raise ValueError("Rol inválido")
 
         self.id= id or uuid4()
         self.username= username_clean
-        self.firstname= first_name_clean
-        self.lastname= last_name_clean
+        self.first_name= first_name_clean
+        self.last_name= last_name_clean
         self.email= email_clean
         self.role= role_clean
         self.is_active= is_active
