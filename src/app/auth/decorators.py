@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import session, redirect, url_for, flash, request
+from flask import session, redirect, url_for, flash, request, abort
 
 def login_required(view_func):
     @wraps(view_func)
@@ -16,8 +16,7 @@ def role_required(required_role):
         @wraps(view_func)
         def wrapper(*args, **kwargs):
             if session.get("role") != required_role:
-                flash("No tiene permisos para acceder a esta sección.", "warning")
-                return redirect(url_for("main.home"))
+                abort(403)
             return view_func(*args, **kwargs)
         return wrapper
     return decorator

@@ -1,6 +1,8 @@
 from . import bp
 from flask import render_template, current_app, request, redirect, flash,url_for
 from app.auth.decorators import login_required, role_required
+from app.domain.exceptions.user_exceptions import UserExistError, EmailExistError
+from app.domain.exceptions.persistence_exceptions import PersistenceError
 
 @bp.route("/users", methods=["GET"], endpoint="users_list")
 @login_required
@@ -39,6 +41,13 @@ def create_user():
         flash("Usuario creado correctamente", "success")
         return redirect(url_for("users.users_list"))
 
-    except ValueError as e:
+    # Captura, representa, redirige la excepcion
+    # Error esperable de Negocio
+    except (UserExistError, EmailExistError) as e:
         flash(str(e), "warning")
+        return redirect(url_for("users.user_form"))
+
+    # Error técnico de Persistencia
+    except PersistenceError:
+        flash("No fue posible guardar el usuario", "warning")
         return redirect(url_for("users.user_form"))

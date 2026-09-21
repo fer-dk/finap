@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash
 from app.domain.entities.user import User
 from app.domain.ports import UserRepoPort, UnitOfWorkPort
+from app.domain.exceptions.user_exceptions import UserExistError, EmailExistError
 
 class UserService:
     def __init__(self, user:UserRepoPort, uow:UnitOfWorkPort):
@@ -16,13 +17,13 @@ class UserService:
             email:str,
             role: str = "user") -> User:
 
-        # Reglas de autenticación (que necesitan infraestructura)
+        # Validaciones previsibles del caso de uso
         if not password:
             raise ValueError("La contraseña es obligatoria.")
         if self.repoUser.find_by_username(username):
-            raise ValueError("El usuario ya existe.")
+            raise UserExistError("El usuario ya existe.")
         if self.repoUser.find_by_email(email):
-            raise ValueError("El email ya se encuentra registrado.")
+            raise EmailExistError("El email ya se encuentra registrado.")
 
         # Valida el username/email ingresado
         user_new = User(
@@ -34,15 +35,11 @@ class UserService:
             )
 
         password_hash = generate_password_hash(password)
+        user = self.repoUser.create_user(user=user_new, password_hash=password_hash) # Retorno
 
-        # Retorno
-        try:
-            user = self.repoUser.create_user(user=user_new, password_hash=password_hash)
-            self.repoUow.commit()       # <-- 1. Esto puede fallar por razones técnicas
-            return user
-        except Exception:               # <-- 2. Atrapas CUALQUIER fallo técnico inesperado
-            self.repoUow.rollback()     # <-- 3. Limpias la base de datos para no dejarla corrupta
-            raise                       # <-- 4. Volver a lanzar el error hacia arriba
+        # Aqui se hace realmente el INSERT, # Puede disparar Fallo inesperado de Integridad
+        self.repoUow.commit()
+        return user
 
     def list_users(self) -> list[User]:
         return self.repoUser.list()

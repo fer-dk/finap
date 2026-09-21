@@ -31,20 +31,19 @@ def insert_prestacion():
 
 @bp.route("/api/prestacion", methods=["GET"], endpoint="api_prestacion_list")
 def api_listar_prestacion():
-    service = current_app.prestacion_service
-    service = service.listar()
+    prestaciones = current_app.prestacion_service.list()
 
     # prestaciones es list[Prestacion] que trae el service.
     # Convertís cada objeto de dominio a JSON un diccionario simple, serializable.
     data = [
         {
             "id": p.id,
-            "nombre": p.nombre
+            "nombre": p.name
         }
-        for p in service
+        for p in prestaciones
     ]
 
-    return jsonify(data), 200
+    return jsonify(data), 200 # devuelve una tupla (response, status_code)
 
 # A - El request ya no llega al caso de uso si el usuario no está autenticado.
 #     Capa intermedia entre la petición HTTP y la función real de la ruta.

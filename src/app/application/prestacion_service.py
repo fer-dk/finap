@@ -27,6 +27,6 @@ class PrestacionService:
             raise
 
     def list(self):
-        return self.prest.list()
+        return self.repoPrest.list()
 
 # A - "Recibo un objeto (repoPrest) que tiene la forma del Puerto."

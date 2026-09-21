@@ -77,8 +77,15 @@ def create_app():
     from app.blueprints.users import bp as users_bp
     app.register_blueprint(users_bp)
 
+    # Registrar Handlers
+    # registramos la funcion que armamos en el handler directo sobre la factory
+    from app.errors.handlers import register_error_handlers
+    register_error_handlers(app)
+
     # === Context Processor inyecta menus a todas las plantillas ===
     from app.config.navigation import main_sections, navbars
+
+
 
     @app.context_processor
     def inject_navigation():
