@@ -6,7 +6,6 @@ from flask import render_template, request, redirect, url_for, flash, jsonify, c
 # Controlador HTTP / HTML (capa de interfaz)
 @bp.route("/prestacion", methods=["GET"], endpoint="prestacion_form") #B,C
 @login_required # A - Adaptador de Entrada (Controller/Driver) de seguridad (no es capa de seguridad)
-@role_required("admin")
 def show_form(): # View Fuction
     # Actua como un Presenter
     return render_template("prestaciones/prestacion.html")

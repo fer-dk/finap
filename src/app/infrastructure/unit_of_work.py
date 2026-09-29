@@ -26,3 +26,20 @@ class Uowork(UnitOfWorkPort):
     #otro caso de uso podría necesitar abortar explícitamente una transacción
     def rollback(self) -> None:
         self.db.session.rollback()
+
+# Niveles de Información sobre el error:
+
+# DB / SQLAlchemy
+# IntegrityError
+# "UNIQUE constraint failed..."
+#         ↓
+#         │ from e
+#         ↓
+# FINAP
+# PersistenceError
+# "No fue posible guardar los datos
+#  por una restricción de integridad."
+#         ↓
+# HTTP
+# 500.html
+# "Se produjo un error interno."

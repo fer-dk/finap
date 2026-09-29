@@ -46,8 +46,3 @@ def create_user():
     except (UserExistError, EmailExistError) as e:
         flash(str(e), "warning")
         return redirect(url_for("users.user_form"))
-
-    # Error técnico de Persistencia
-    except PersistenceError:
-        flash("No fue posible guardar el usuario", "warning")
-        return redirect(url_for("users.user_form"))
