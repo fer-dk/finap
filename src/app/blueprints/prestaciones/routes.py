@@ -5,7 +5,7 @@ from flask import render_template, request, redirect, url_for, flash, jsonify, c
 
 # Controlador HTTP / HTML (capa de interfaz)
 @bp.route("/prestacion", methods=["GET"], endpoint="prestacion_form") #B,C
-@login_required # A - Adaptador de Entrada (Controller/Driver) de seguridad (no es capa de seguridad)
+@login_required # A - Adaptador de Entrada (Controller/Driver) de seguridad (no es capa de seguridad es autenticación)
 def show_form(): # View Fuction
     # Actua como un Presenter
     return render_template("prestaciones/prestacion.html")
@@ -29,9 +29,9 @@ def insert_prestacion():
 # =======================
 
 @bp.route("/api/prestacion", methods=["GET"], endpoint="api_prestacion_list")
+@login_required
 def api_listar_prestacion():
     prestaciones = current_app.prestacion_service.list()
-
     # prestaciones es list[Prestacion] que trae el service.
     # Convertís cada objeto de dominio a JSON un diccionario simple, serializable.
     data = [

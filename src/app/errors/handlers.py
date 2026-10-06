@@ -11,16 +11,16 @@ def register_error_handlers(app):
             return jsonify({"error": "not_found", "message": "Recurso no encontrado"}), 404
         return render_template("errors/404.html"), 404 # FLask reconoce(equivale) a una tupla (contenido, status_code y tambien headers)
 
-    @app.errorhandler(403) # significa: estás autenticado, pero no estás autorizado para hacer esto.
+    @app.errorhandler(403) # estás autenticado, pero no estás autorizado para este recurso.
     def forbidden(error):
         if request.path.startswith("/api/"):
             return jsonify({"error": "forbidden", "message": "No tiene permisos"}), 403
         return render_template("errors/403.html"), 403
 
-    @app.errorhandler(401) # significa en la práctica: ¿Quién sos? Necesitás autenticarte..
-    def authentification_required(error):
+    @app.errorhandler(401) # ¿Quién sos? Necesitás autenticarte..
+    def unauthorized(error):
         if request.path.startswith("/api/"):
-            return jsonify({"error": "authentification_required", "message": "Debes iniciar sesión"}), 401
+            return jsonify({"error": "unauthorized", "message": "Debes iniciar sesión"}), 401
         return render_template("errors/401.html"), 401
 
     @app.errorhandler(400) # La petición HTTP que recibió el servidor no es válida o no puede procesarse correctamente por cómo fue enviada.

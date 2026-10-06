@@ -1,30 +1,40 @@
 import os
 from pathlib import Path
 
-# Flask solo toma los atributos en MAYUSCULA del objeto/modulo
-class DbConfig:
+# Configuracion común a todos los entornos
+class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # La sesión de Flask por defecto está firmada con SECRET_KEY
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
+
+class DevConfig(BaseConfig):
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret") # La sesión de Flask por defecto está firmada con SECRET_KEY
+    SQLALCHEMY_DATABASE_URI = os.environ["DATABASE_URL"] # Obligatoria en desarrollo
+
+class ProdConfig(BaseConfig):
+    SECRET_KEY = os.environ["SECRET_KEY"] # Obligatoria en produccion
+    SQLALCHEMY_DATABASE_URI = os.environ["DATABASE_URL"]
+
+
+
+
 
 # Entorno Corporativo -----------------------------
-class Nas(DbConfig):
+class Nas(BaseConfig):
     UNC_PATH = r"\\nasmoreno01\Finanzas 2\GESTION INFORMES DGF\DATOS\Rename\db3.sqlite"
     _sqlite_path = ("/////" + UNC_PATH.lstrip("\\").replace("\\", "/"))
     SQLALCHEMY_DATABASE_URI = f"sqlite:{_sqlite_path}?timeout=30"
 
-class NasDev(DbConfig):
+class NasDev(BaseConfig):
     DEV_DB = Path(os.environ.get("LOCALAPPDATA", ".")) / "FINAP_DEV" / "db_dev.sqlite"
     DEV_DB.parent.mkdir(parents=True, exist_ok=True)
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{DEV_DB.as_posix()}"
 
 # Entorno Backend Profesional ---------------------
-class DevLite(DbConfig):
+class DevLite(BaseConfig):
     DEV_DB = Path.home() / "workspace" / "finap" / "data" / "db_dev.sqlite"
     DEV_DB.parent.mkdir(parents=True, exist_ok=True)
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{DEV_DB.as_posix()}"
 
-class DevMysql(DbConfig):
+class DevMysql(BaseConfig):
     SQLALCHEMY_DATABASE_URI = (
         "mysql+pymysql://finap_user:darliot2@127.0.0.1:3306/finap_dev"
         "?charset=utf8mb4"

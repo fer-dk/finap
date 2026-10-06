@@ -21,6 +21,7 @@ class Uowork(UnitOfWorkPort):
             self.db.session.commit()
         except IntegrityError as e:
             self.db.session.rollback()
+            # Informacion diagnnostica que no se muestra (se ve x consola)
             raise PersistenceError("No fue posible guardar los datos por una restricción de integridad.") from e
 
     #otro caso de uso podría necesitar abortar explícitamente una transacción
@@ -28,6 +29,7 @@ class Uowork(UnitOfWorkPort):
         self.db.session.rollback()
 
 # Niveles de Información sobre el error:
+# Cada nivel conoce menos detalles internos que el anterior.
 
 # DB / SQLAlchemy
 # IntegrityError
