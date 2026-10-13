@@ -5,7 +5,15 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
-from app.config import DevMysql, DevLite, DevMigrationMysql
+from pathlib import Path
+
+# Las variables de .enc están "disponibles ANTES q python evalúe las clases de configuración"
+from dotenv import load_dotenv
+# Raíz del proyecto FINAP
+BASE_DIR = Path(__file__).resolve().parent[2] # FINAP/ es parent[2], src/ es parent[1], app/ es parent[0]
+load_dotenv(BASE_DIR / ".env")# Carga variables del archivo .env si existe
+
+from app.config import DevConfig, ProdConfig, DevMigrationMysql
 
 # --- Inicializamos Extensiones globales ---
 db = SQLAlchemy()
@@ -26,22 +34,23 @@ from app.application.user_service import UserService
 # Construye y devuelve una instancia de Flask configurada
 def create_app():
     app = Flask(__name__, instance_relative_config=True) # Instancia de Flask
+    env = os.environ.get("APP_ENV", "development") # seleccion configuración de Aplicación
+    config_map = {"devlopment": DevConfig, "production": ProdConfig,}
+    config_class = config_map.get(env) # Contiene una referencia a la propia clase
 
-    env = os.environ.get("APP_ENV", "DevMysql") # Busca en el sistema APP_ENV
+    # Validación 1: existe configuración?
+    if config_class is None:
+        raise ValueError(f"Configuracion desconocida en APP_ENV {env}")
 
-    config_map = {
-        "DevMysql": DevMysql,
-        "DevLite": DevLite,
-        "DevMigrationMysql": DevMigrationMysql
-    }
+    # Carga los atributos de la referencia de la clase configuración dentro de la aplicación
+    app.config.from_object(config_class)
 
-    config_class = config_map.get(env) # Bloque de seguridad
-    if config_map is None:
-        raise ValueError(
-            f"Configuracion desconocida en APP_ENV {env}"
-        )
-
-    app.config.from_object(config_class) # Elige configuración
+    # Validación 2 Dev/Prod:
+    if not app.config.get("SQLALCHEMY_DATABASE_URI"):
+        raise RuntimeError("DATABASE URL es obligatoria para iniciar FINAP")
+    # Validación 3 Prod:
+    if env=="production" and not app.config.get("SECRET_KEY"):
+        raise RuntimeError("SECRET_KEY es obligatoria en producción")
 
     db.init_app(app) # conecta SQLAlchemy con Flask
     migrate.init_app(app, db) # conecta Flask-Migrate y registra comondo "db"

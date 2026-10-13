@@ -1,18 +1,64 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 
-# Configuracion común a todos los entornos
+from datetime import timedelta
+
+# ProductionConfig
+# SECRET_KEY       → obligatoria
+# cookie HttpOnly  → sí
+# cookie Secure    → según HTTPS, normalmente sí
+# SameSite         → política explícita
+# duración sesión  → explícita
+
+# Límite de Inactividad: 30m
+# Límite absoluto: 8hrs
+
+# Politicas generales de sesión
 class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Seguridad de cookies (configuración nativa de Flask)
+    # Flask controla la validez criptográfica y temporal de la cookie.
+    SESSION_COOKIE_HTTPONLY = True  # A
+    SESSION_COOKIE_SAMESITE = "Lax" # B
+    SESSION_REFRESH_EACH_REQUEST = False # C
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=8) # D
+
+    # Política FINAP (configuración No nativas) FINAP controla la política de atenticación del Usuario
+    # Flask no aplica estos límites automáticamente. FINAP deberá comprobarlos en cada solicitud autenticada.
+    SESSION_IDLE_TIMEOUT = timedelta(minutes=30) # E
+    SESSION_ABSOLUTE_TIMEOUT = timedelta(hours=8) # F
+
 class DevConfig(BaseConfig):
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret") # La sesión de Flask por defecto está firmada con SECRET_KEY
-    SQLALCHEMY_DATABASE_URI = os.environ["DATABASE_URL"] # Obligatoria en desarrollo
+    SQLALCHEMY_DATABASE_URI = os.environ.get["DATABASE_URL"]
+    SESSION_COOKIE_SECURE = False # Envia la cookie unicamente mediante HTTPS(adaptado a localhost)
 
+# Representa las reglas de seguridad y comportamiento de una app en produccion
 class ProdConfig(BaseConfig):
-    SECRET_KEY = os.environ["SECRET_KEY"] # Obligatoria en produccion
-    SQLALCHEMY_DATABASE_URI = os.environ["DATABASE_URL"]
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    SESSION_COOKIE_SECURE = True # Presupone que el despliegue en producción utiliza HTTPS
 
+# A - Impide que JavaScript acceda directamente a la cookie de sesión.
+
+# B - Restringe el envío de cookies en solicitudes entre sitios.
+#     Ayuda a reducir ciertos riesgos de CSRF.
+
+# C - Evita que Flask renueve automáticamente la cookie permanente en cada respuesta.
+#     No impide renovaciones por cambios de sesión.
+
+# D - Controla vigencia de la cookie permanente (de sesión firmada), puede extenderse al emitir una nueva cookie.
+#     Al vencer, Flask deja de aceptar la cookie vencida. FINAP rechazará la sesión pq pasaron 8hrs.
+#     El rechazo se detecta sólo cuando llega una solicitud. No significa q cierre a las 8hrs
+
+# E - Tiempo máximo permitido desde la última actividad válida.
+#     Cada actividad reconocida reinicia este contador.
+
+# F - FINAP detecta el vencimiento y rechaza la sesión
+#     Tiempo máximo permitido desde el inicio de sesión original.
+#     No se reinicia con la actividad ni con la renovación de cookies.
 
 
 
