@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import session, redirect, url_for, flash, request, abort
 
+# Impedir el acceso cuando no existe una sesión autenticada
 def login_required(view_func):
     @wraps(view_func)
     def wrapper(*args, **kwargs): # A

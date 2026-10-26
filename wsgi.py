@@ -1,8 +1,9 @@
-from app import create_app
+from app import create_app # Importa el paquete "app" desde src/app/__init__.py
 import os
 
-app = create_app() # usamos la factory
+app = create_app() # devuelve el objeto creado de la factory
 
+# Devuelve el valor dentro de VERSION.txt
 def _read_version() -> str: # A Buscamos el directorio donde se encuentra wsgi.py
     base_dir = os.path.dirname(os.path.abspath(__file__)) # B
     version_path = os.path.join(base_dir, "VERSION.txt") # C
@@ -13,7 +14,7 @@ def _read_version() -> str: # A Buscamos el directorio donde se encuentra wsgi.p
     except OSError: #F
         return "unknown"
 
-app.config["APP_VERSION"] = _read_version() #G
+app.config["APP_VERSION"] = _read_version() #G - Agrega el valor leido al diccionario de configuración de Flask
 
 # A - "_read.." indica que la funcion existe para uso interno del modulo, no para ser importada desde otro lado
 

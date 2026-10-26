@@ -1,7 +1,8 @@
 # Patrón utilizado - Application Factory / factory modular:
 #   Permite registrar blueprints, tambien usar tests o configs por entorno
 #   Evita importaciones circulares y Podés crear varias instancias de la app
-from flask import Flask, request
+from flask import Flask, request, session
+from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
@@ -10,10 +11,10 @@ from pathlib import Path
 # Las variables de .enc están "disponibles ANTES q python evalúe las clases de configuración"
 from dotenv import load_dotenv
 # Raíz del proyecto FINAP
-BASE_DIR = Path(__file__).resolve().parent[2] # FINAP/ es parent[2], src/ es parent[1], app/ es parent[0]
-load_dotenv(BASE_DIR / ".env")# Carga variables del archivo .env si existe
+BASE_DIR = Path(__file__).resolve().parents[2] # FINAP/ es parent[2], src/ es parent[1], app/ es parent[0]
+load_dotenv(BASE_DIR / ".env", override=False) # Carga variables del archivo .env si existe
 
-from app.config import DevConfig, ProdConfig, DevMigrationMysql
+from app.config import DevConfig, ProdConfig, TestConfig, DevMigrationMysql
 
 # --- Inicializamos Extensiones globales ---
 db = SQLAlchemy()
@@ -32,13 +33,16 @@ from app.application.auth_service import AuthService
 from app.application.user_service import UserService
 
 # Construye y devuelve una instancia de Flask configurada
-def create_app():
-    app = Flask(__name__, instance_relative_config=True) # Instancia de Flask
+def create_app(config_class=None):
+    app = Flask(__name__, instance_relative_config=True) # Crea un objeo/instancia de Flask
     env = os.environ.get("APP_ENV", "development") # seleccion configuración de Aplicación
-    config_map = {"devlopment": DevConfig, "production": ProdConfig,}
-    config_class = config_map.get(env) # Contiene una referencia a la propia clase
+    config_map = {"development": DevConfig, "production": ProdConfig, "Testing": TestConfig}
 
-    # Validación 1: existe configuración?
+    # Si no pasan una configuracion explicita (por parametro)...
+    if config_class is None:
+        config_class = config_map.get(env) # Contiene una referencia a la propia clase
+
+    # Validación 1: Si no pasan una configuracion valida...
     if config_class is None:
         raise ValueError(f"Configuracion desconocida en APP_ENV {env}")
 
@@ -53,7 +57,7 @@ def create_app():
         raise RuntimeError("SECRET_KEY es obligatoria en producción")
 
     db.init_app(app) # conecta SQLAlchemy con Flask
-    migrate.init_app(app, db) # conecta Flask-Migrate y registra comondo "db"
+    migrate.init_app(app, db) # conecta Flask-Migrate y registra comando "db"
 
     # ADAPTADORES (definicion) === Inyeccion de dependencias ===
     app.log_repo = LogRepo(db)
@@ -94,8 +98,7 @@ def create_app():
     # === Context Processor inyecta menus a todas las plantillas ===
     from app.config.navigation import main_sections, navbars
 
-
-
+    # Proporciona variables a las plantillas Jinja
     @app.context_processor
     def inject_navigation():
         bp_name = request.blueprint or "main"
@@ -107,5 +110,35 @@ def create_app():
             nav_items=nav_items,
             current_bp= bp_name
         )
+
+    # Valida y Finaliza (o no) una Autenticación existente
+    @app.before_request
+    def check_session_timeout():
+        # Validacion 1 - existencia de identificador de usuario en la sesion
+        if "user_id" not in session:
+            return
+
+        now = datetime.now(timezone.utc).timestamp()
+        login_at = session.get("login_at")
+        last_activity = session.get("last_activity")
+
+        # Validacion 2 - Integridad de la version sesion (cookie anterior con una version desactualizada(en login_post)
+        if login_at is None or last_activity is None:
+            session.clear()
+            return
+
+        idle_elapsed = now - last_activity
+        absolute_elapsed = now - login_at
+        idle_limit = app.config["SESSION_IDLE_TIMEOUT"].total_seconds()
+        absolute_limit = app.config["SESSION_ABSOLUTE_TIMEOUT"].total_seconds()
+
+        # Validacion 3 - controles de expiración de autenticación
+        if idle_elapsed >= idle_limit or absolute_elapsed >= absolute_limit:
+            session.clear()
+            return
+
+        # Renovacion de actividad (politica aproximada de renovacion)
+        if request.method in ("GET", "POST") and not request.path.startswith("/api/"):
+            session["last_activity"] = now
 
     return app
